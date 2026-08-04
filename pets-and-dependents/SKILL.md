@@ -26,3 +26,8 @@ count.**
 
 This skill is the second block of the EDW → Pets → Quine sync workflow; it enriches
 [edw-fetch](../edw-fetch)'s records and hands them to [quine-ingest](../quine-ingest).
+
+## For the recurring new-arrivals sync
+Call the **`family_get_pets`** tool (on the family-connector) with the **`batch_id`**
+from the edw-fetch skill. It stages the pets onto that batch. Then pass the same
+`batch_id` to the quine-ingest skill.

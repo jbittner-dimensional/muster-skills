@@ -26,3 +26,8 @@ belong to. Read it through the **edw connector** — never scrape it directly.
 This skill is the first block of the EDW → Pets → Quine sync workflow. It hands
 its records to [pets-and-dependents](../pets-and-dependents) and
 [quine-ingest](../quine-ingest).
+
+## For the recurring new-arrivals sync
+Call the **`edw_get_arrivals`** tool (on the edw-connector). It returns a small
+**`batch_id`** and stages the batch server-side. Pass that `batch_id` to the
+pets-and-dependents skill next — do not try to pass the records yourself.
