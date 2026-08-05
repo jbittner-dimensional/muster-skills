@@ -12,14 +12,47 @@ it does not go out.
 
 ## Where the numbers come from
 
-**One call: `muster_officer_brief({ station })`.** It returns the station rollup, the
-full roster for the role with contacts and dependents, per-row risk flags, the derived
-chain of command, every source disagreement ranked by consequence, and the lineage with
-each source's age. Slide what it returns.
+**One call: `muster_officer_brief({ station })`.** Slide what it returns.
 
 Do not re-derive a number, do not call a tool per person, and do not use
 `muster_call_tree` for this — it joins through pets, so it returns only people who own
 one and silently drops most of the roster from an emergency call tree.
+
+### Two scopes. Never put them in one sentence.
+
+The payload has **`scope_station`** (the whole station) and **`scope_roster`** (the staff
+officers, a subset). Each carries a finished `label` — use those strings.
+
+A deck once printed *"21 staff officers · 14 households · 21 children · 4 pets · station
+total 127"*. Every number is true and the line is a lie: the households, children and pets
+are the **officers'**, while 127 is the **station's**. KESTREL has 91 households and 130
+children. A station reading that line plans for 21 children instead of 130.
+
+If the slide shows dependents beside a station total, it shows
+`scope_station.label`. Roster figures always say whose they are.
+
+### Copy the strings; do not compose your own
+
+The payload writes out anything a reader acts on. Place these verbatim:
+
+- `officers[].action` — the call instruction. **Do not derive it from `risk`.** A deck
+  turned `no_second_adult` into "ESCALATE via lead" for officers who had their own phone;
+  you would call those people directly. `action` already says which.
+- `scope_roster.gap_label`, `scope_roster.second_adult_label` — these count **officers**,
+  not households. A deck mislabelled the unit.
+- `scope_station.headline` — the unaccounted sentence.
+
+### Say when the chain itself is doubtful
+
+Each `chain[]` entry has `disputed`. When true, print `DISPUTED — see conflicts` beside
+that name. A deck sent the reader to the region lead for escalation while listing that
+same person in a location conflict lower on the page.
+
+### Never point at something you did not produce
+
+A deck said the full roster was "in the accompanying export" when no export existed. If a
+figure is not on the slide, either publish the file in the same turn and name it, or say
+plainly that it is not included. Never reference an artifact you have not created.
 
 ## What to produce
 
@@ -85,11 +118,19 @@ Status is never color alone: every status carries its word.
 - **Set the theme font to Arial.** Do not specify Inter or any bundled font — it will
   substitute on the reviewer's machine and the deck will arrive looking broken. Run
   `detect_font.py` if you are unsure.
-- **Render before delivering.** `render_slides.py`, look at the PNG, then
-  `slides_test.py` for overflow. A slide that overflows its canvas is not delivered.
-  Overflow is not cosmetic: the first HTML build of this same content had the conflicts
-  block drawing on top of the fourth call. Reduce the roster shown, shrink the block,
-  and render again.
+- **Stack rows from a cursor; do not hand-place y-coordinates.** Keep one `y` variable per
+  column and advance it by the row height after each row. Hand-placed absolute positions
+  are why one build chased 29 overlap warnings through six patch cycles: every fix moved
+  something else. With a cursor, a font or size change moves the whole column together.
+- **Render before delivering.** `render_slides.py` (or `soffice --headless --convert-to
+  pdf` then `pdftoppm`), look at the PNG, then `slides_test.py`. Read its warnings with
+  judgement: it flags overlapping *bounding boxes*, and a label sitting inside its own
+  coloured bar is intentional. Fix what is visible in the PNG; do not chase a warning
+  count to zero.
+- **Ignore `detect_font.py` reporting Arial and Courier New "missing".** The container
+  resolves them to Liberation Sans and Liberation Mono, which are metric-compatible —
+  same advance widths — so the layout you see in the render is the layout PowerPoint
+  produces. Keep specifying Arial.
 - Deliver the `.pptx` and the authoring `.js`. Name the file
   `muster-accountability-<STATION>-<YYYYMMDD>.pptx`.
 
