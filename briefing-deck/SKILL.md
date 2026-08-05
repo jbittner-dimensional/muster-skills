@@ -5,18 +5,28 @@ description: How to export a muster answer as a one-slide PowerPoint briefing �
 
 # Briefing Deck
 
-When the officer asks for a slide, a deck, a briefing, or "something I can send",
-build a real `.pptx` with the `slides` skill. What leaves this system is a work
-product someone forwards to a general. It carries its markings and its sources, or
-it does not go out.
+When the officer asks for a slide, a deck, a briefing, or "something I can send" for a
+station, call **`muster_officer_slide({ station })`**. It returns a real one-slide `.pptx`
+as a download link, rendered from the graph in about ten seconds.
 
-## Where the numbers come from
+**Do not author the deck yourself.** Authoring it took twenty tool calls and three
+minutes, produced a different slide every run, and could die mid-build on an upstream
+error. Everything on the page is already computed; the layout is now code that is tested
+for collisions and for the honesty rules below, so it comes out the same every time.
 
-**One call: `muster_officer_brief({ station })`.** Slide what it returns.
+Say the sheet is ready, name the file, and give the officer the headline the tool returns:
+how many are unaccounted for, how many are unreachable, how many conflicts await a ruling.
+It goes out stamped DRAFT — say plainly that a person must review it before release.
 
-Do not re-derive a number, do not call a tool per person, and do not use
-`muster_call_tree` for this — it joins through pets, so it returns only people who own
-one and silently drops most of the roster from an emergency call tree.
+Ask for `format: "html"` only if the officer explicitly wants a printable sheet instead of
+a deck. Never use `muster_call_tree` for this — it joins through pets, so it returns only
+people who own one and drops most of the roster from an emergency call tree.
+
+## What the slide contains, and why
+
+Read `muster_officer_brief({ station })` if you need to discuss the numbers in chat — the
+slide is rendered from exactly this payload. The rules below are already enforced by the
+renderer; they are written down so you can explain the page and spot it if it ever drifts.
 
 ### Two scopes. Never put them in one sentence.
 
