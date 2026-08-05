@@ -22,11 +22,14 @@ the picture auditable: you can always ask where a value came from and when.
 The graph never picks a winner between conflicting facts — a certified policy
 does (see [conflict-adjudication](../conflict-adjudication)).
 
-This skill is the final block of the EDW → Pets → Quine sync workflow: it takes the
-records from [edw-fetch](../edw-fetch) and [pets-and-dependents](../pets-and-dependents)
-and lands them in the living graph.
+The rules above hold for every write to the graph, including the continuous feed. As a
+pipeline step, this is the final block of the **one-off** EDW → Pets → Quine batch sync:
+it takes the records from [edw-fetch](../edw-fetch) and
+[pets-and-dependents](../pets-and-dependents) and lands them in the living graph.
+For a feed that must stay current, see [continuous-feed](../continuous-feed) — its ETL
+legs write to the graph under these same rules, with no ingest call from you.
 
-## For the recurring new-arrivals sync
+## For a one-off arrivals batch
 Call the **`quine_ingest_batch`** tool (on the muster-quine connector) with the
 **`batch_id`** — it ingests the whole staged batch (personnel + households + pets)
 as event-sourced facts. Report the batch_id and how many records were ingested.

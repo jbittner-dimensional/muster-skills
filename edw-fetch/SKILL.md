@@ -1,9 +1,14 @@
 ---
 name: edw-fetch
-description: How to pull personnel and household records from the Enterprise Data Warehouse — carrying provenance and as-of, and flagging stale snapshots.
+description: How to pull ONE BATCH of personnel and household records from the Enterprise Data Warehouse — carrying provenance and as-of, and flagging stale snapshots. For a feed that must stay current, use continuous-feed instead.
 ---
 
 # Fetch from the Enterprise Data Warehouse
+
+> **This is the one-off path.** If the officer wants the picture to *stay current*
+> — "keep it current", "not a one-off", "get that flowing" — stop here and use
+> [continuous-feed](../continuous-feed): a single `muster_setup_etl` call. Do not
+> assemble the batch chain for a continuous ask.
 
 The EDW is the system of record for who works where and which household they
 belong to. Read it through the **edw connector** — never scrape it directly.
@@ -23,11 +28,11 @@ belong to. Read it through the **edw connector** — never scrape it directly.
 3. **Fetch the delta, not the world.** For a recurring sync, pull only what has
    changed since the last run so the ingest stays small and cheap.
 
-This skill is the first block of the EDW → Pets → Quine sync workflow. It hands
-its records to [pets-and-dependents](../pets-and-dependents) and
+This skill is the first block of the **one-off** EDW → Pets → Quine batch sync. It
+hands its records to [pets-and-dependents](../pets-and-dependents) and
 [quine-ingest](../quine-ingest).
 
-## For the recurring new-arrivals sync
+## For a one-off arrivals batch
 Call the **`edw_get_arrivals`** tool (on the edw-connector). It returns a small
 **`batch_id`** and stages the batch server-side. Pass that `batch_id` to the
 pets-and-dependents skill next — do not try to pass the records yourself.

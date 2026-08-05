@@ -13,8 +13,11 @@ at the repo root is rejected.
 
 ## The library
 
-**Data-plane blocks** (compose into the every-5-minutes EDW → Pets → Quine sync workflow)
-- `edw-fetch` — pull personnel + households from the warehouse connector.
+**The standing feed** (what the officer asks for in a crisis — "keep it current")
+- `continuous-feed` — stand up the always-on dependents-and-pets ETL in ONE call. Not a batch chain, not a scheduled task.
+
+**Data-plane blocks** (the one-off EDW → Pets → Quine batch sync, on demand)
+- `edw-fetch` — pull one batch of personnel + households from the warehouse connector.
 - `pets-and-dependents` — account for dependents and pets by household (the Sponsor calls out pets).
 - `quine-ingest` *(Muster-Quine)* — ingest records as event-sourced facts into the living graph.
 

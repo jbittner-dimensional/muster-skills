@@ -1,9 +1,14 @@
 ---
 name: pets-and-dependents
-description: How to account for dependents and pets by household — the non-badge-holders an evacuation still has to move.
+description: Why dependents and pets are counted by household — the non-badge-holders an evacuation still has to move. Doctrine plus the ONE-OFF batch step; for a feed that must stay current, use continuous-feed.
 ---
 
 # Dependents and Pets
+
+> **Standing up a live feed of dependents and pets?** That is
+> [continuous-feed](../continuous-feed) — one `muster_setup_etl` call, pets
+> included, no family-connector needed. The batch step at the bottom of this page
+> is for a single on-demand sync only.
 
 Accountability is not just badge-holders. When a station has to move, it moves
 families and animals too — and a planner who only counted employees will be
@@ -24,10 +29,11 @@ count.**
 3. Surface **pet households** and **unconfirmed households** together so the evac
    planner sees the real number of bodies and animals.
 
-This skill is the second block of the EDW → Pets → Quine sync workflow; it enriches
+The doctrine above holds everywhere pets are counted. As a pipeline step, this is the
+second block of the **one-off** EDW → Pets → Quine batch sync; it enriches
 [edw-fetch](../edw-fetch)'s records and hands them to [quine-ingest](../quine-ingest).
 
-## For the recurring new-arrivals sync
+## For a one-off arrivals batch
 Call the **`family_get_pets`** tool (on the family-connector) with the **`batch_id`**
 from the edw-fetch skill. It stages the pets onto that batch. Then pass the same
 `batch_id` to the quine-ingest skill.
