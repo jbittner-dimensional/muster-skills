@@ -16,7 +16,8 @@ for collisions and for the honesty rules below, so it comes out the same every t
 
 Say the sheet is ready, name the file, and give the officer the headline the tool returns:
 how many are unaccounted for, how many are unreachable, how many conflicts await a ruling.
-It goes out stamped DRAFT — say plainly that a person must review it before release.
+For the unreachable part, **place `unreachable.sentence` as written** — never say "N unreachable"
+on your own. It goes out stamped DRAFT — say plainly that a person must review it before release.
 
 Ask for `format: "html"` only if the officer explicitly wants a printable sheet instead of
 a deck. Never use `muster_call_tree` for this — it joins through pets, so it returns only
@@ -35,11 +36,52 @@ officers, a subset). Each carries a finished `label` — use those strings.
 
 A deck once printed *"21 staff officers · 14 households · 21 children · 4 pets · station
 total 127"*. Every number is true and the line is a lie: the households, children and pets
-are the **officers'**, while 127 is the **station's**. KESTREL has 91 households and 130
-children. A station reading that line plans for 21 children instead of 130.
+are the **officers'**, while 127 is the **station's** — and the station has roughly six
+times the officers' figure. A station reading that line plans for a fraction of the
+children it actually has.
+
+(No literal counts here on purpose. The arrivals feed moves KESTREL between reads, and
+every earlier attempt to pin this in prose went stale — this passage itself claimed "91
+households and 130 children" against a truth of 87 and 126.)
 
 If the slide shows dependents beside a station total, it shows
 `scope_station.label`. Roster figures always say whose they are.
+
+### The sheet covers the whole station unless you narrow it
+
+`position_type` holds five **peer** job families — officer, specialist, support, attache, analyst — not a
+seniority ladder with "officer" on top of the rest. One family is roughly a sixth of a station, so
+`muster_officer_slide({ station })` rosters **all** of them by default.
+
+Pass `role` only when the officer names a family ("just my officers"), and say that you narrowed it. A
+commander who asks who is unaccounted for and receives a sheet covering 17% of the station, with nothing on
+the page saying so, has been quietly misinformed — that is the same failure as mixing the two scopes.
+
+`scope_roster.excluded_note`, when present, names who is on **no** roster: people carrying no
+`position_type` at all. Today that is the arrivals feed — in transit, no phone, no email. Say it. The
+least reachable people on the station are the ones no roster can list.
+
+### The same rule for reachability
+
+`unreachable` carries **two** populations: `unreachable.roster` (staff officers with no
+contact path) and `unreachable.station` (station-wide conflicts flagged unreachable —
+arrivals, duplicates, people not on this roster at all). They are different numbers about
+different people.
+
+Place **`unreachable.sentence`**, which names both. Do not pick one and call it
+"unreachable". A deck printed `1 unreachable` from the station-wide count while the chat
+answer beside it said `0 officers unreachable`; both were true, and the reader had no way
+to tell which question either was answering.
+
+### The personnel total has a caveat — say it
+
+`scope_station.personnel` is what **EDW rosters**, and EDW rosters a member in PCS at their
+*origin* station. So people assigned to this station can be missing from its own count —
+at KESTREL, eight of them, four being officers.
+
+When `roster_gap.label` is present, say it. It is hedged ("at least N") on purpose: the
+derivation can only see members who have a household based here, so anyone rostered away
+with no household record is invisible to it. Do not tighten that hedge into an exact count.
 
 ### Copy the strings; do not compose your own
 
@@ -50,7 +92,12 @@ The payload writes out anything a reader acts on. Place these verbatim:
   you would call those people directly. `action` already says which.
 - `scope_roster.gap_label`, `scope_roster.second_adult_label` — these count **officers**,
   not households. A deck mislabelled the unit.
+- `scope_roster.household_note` — states all three buckets (with dependents / no household
+  record / household on file but no dependents listed). Do not do the subtraction yourself;
+  the three do not always sum the way two of them suggest.
 - `scope_station.headline` — the unaccounted sentence.
+- `unreachable.sentence` — reachability, with both populations named.
+- `roster_gap.label` — the caveat on the personnel total, when present.
 
 ### Say when the chain itself is doubtful
 
@@ -80,9 +127,11 @@ through — the officer asked for the answer, not a deck.
    `assets/amentum-logo-white.png` if it is there, otherwise the word `AMENTUM` in
    white, letter-spaced.
 3. **The count, not the ratio.** The largest thing on the slide is how many people are
-   unaccounted for (`rollup.unconfirmed`), in critical red, with `of N personnel`
+   unaccounted for (`scope_station.unconfirmed`), in critical red, with `of N personnel`
    beneath it. A percentage may sit beside it as support. A watch officer counts people;
-   percentages are for reports.
+   percentages are for reports. Every hero-row tile names its population — `PERSONNEL ·
+   STATION`, `STAFF OFFICERS`, `CHILDREN · STATION` — because two of those figures come
+   from `scope_station` and one from `scope_roster`, and a bare label cannot tell you which.
 4. **First calls, in the order the payload gives them.** The roster arrives ranked by
    consequence — no contact path first, then most dependents. Do not re-sort
    alphabetically. One block per person: name bold in `#10161F`, role and muster status
@@ -91,10 +140,11 @@ through — the officer asked for the answer, not a deck.
    Whoever has no number stays on the list; their action is `ESCALATE — via station
    lead` with the lead's number. Dropping someone because they are unreachable is how
    people get missed.
-5. **What we do not have.** State `rollup.no_contact_path.length` plainly, with the
-   names. Name the scope — these are staff officers — because the conflicts block below
-   is station-wide and a bare "0 unreachable" beside an unreachable name reads as a
-   contradiction.
+5. **What we do not have.** State `scope_roster.no_contact_path.length` plainly, with the
+   names, under a label that says these are staff officers. The conflicts block below is
+   station-wide, so a bare "0 unreachable" beside an unreachable name in that block reads
+   as a contradiction — `unreachable.station_label` is the sentence that resolves it, and
+   the page carries it whenever the two populations disagree.
 6. **Conflicting information — officer decision required.** The disagreements the system
    found, highest severity first, each showing both sides with its source and value
    (`MUSTER GRAPH: KESTREL` ≠ `EDW: IN_TRANSIT`). Print `conflict_count` as the badge —
@@ -106,9 +156,11 @@ through — the officer asked for the answer, not a deck.
 
 ## Colors
 
-Status color only ever means muster state: confirmed `#3FA46A`, unconfirmed
-`#E8A33D`, critical `#E05C5C`. Source color is fixed: EDW `#3987E5`, derived
-`#9085E9`. Amentum green `#3EB55A` is brand only — it never encodes data.
+These are the renderer's actual values — quoted so you can describe the page, not so you
+can repaint it. Status color only ever means muster state: confirmed `#1E7A3C`,
+unconfirmed `#B07818`, critical `#A33030`. Source color is fixed: EDW `#1C5CAB`, MUSTER
+GRAPH `#14707F`, PETNET `#5B50B8`, derived `#74849B`. The classification banner is
+`#007A33`. Amentum green is brand only — it never encodes data.
 Status is never color alone: every status carries its word.
 
 ## Rules
@@ -125,24 +177,29 @@ Status is never color alone: every status carries its word.
   sends to a station; anything that reads like a sales document destroys the
   credibility of every number beside it. It carries its markings, its distribution line
   and its reference — nothing else.
-- **Set the theme font to Arial.** Do not specify Inter or any bundled font — it will
-  substitute on the reviewer's machine and the deck will arrive looking broken. Run
-  `detect_font.py` if you are unsure.
-- **Stack rows from a cursor; do not hand-place y-coordinates.** Keep one `y` variable per
-  column and advance it by the row height after each row. Hand-placed absolute positions
-  are why one build chased 29 overlap warnings through six patch cycles: every fix moved
-  something else. With a cursor, a font or size change moves the whole column together.
-- **Render before delivering.** `render_slides.py` (or `soffice --headless --convert-to
-  pdf` then `pdftoppm`), look at the PNG, then `slides_test.py`. Read its warnings with
-  judgement: it flags overlapping *bounding boxes*, and a label sitting inside its own
-  coloured bar is intentional. Fix what is visible in the PNG; do not chase a warning
-  count to zero.
-- **Ignore `detect_font.py` reporting Arial and Courier New "missing".** The container
-  resolves them to Liberation Sans and Liberation Mono, which are metric-compatible —
-  same advance widths — so the layout you see in the render is the layout PowerPoint
-  produces. Keep specifying Arial.
-- Deliver the `.pptx` and the authoring `.js`. Name the file
-  `muster-accountability-<STATION>-<YYYYMMDD>.pptx`.
+- **The file is named for you.** `muster_officer_slide` returns the name — currently
+  `<station>-accountability-<YYYY-MM-DD>.pptx`, lowercase. Use what the tool returns; do
+  not construct a name or rename the download.
+
+## How the renderer holds the page together
+
+Not instructions for you — you are not building this. Written down so you can explain the
+page, and notice if it ever drifts.
+
+- **Rows advance a cursor; nothing is hand-placed at an absolute y.** That is what makes
+  overlap impossible by construction rather than something discovered in a render. One
+  earlier hand-placed build chased 29 overlap warnings through six patch cycles, each fix
+  moving something else.
+- **The canvas is fixed** — 13.333 × 7.5in for the deck, 1920 × 1080 for the HTML sheet —
+  so vertical budget is real. When a new row has to appear it either fits in existing
+  slack or something else gives; the right column shows fewer conflict cards and the badge
+  still states the true total, so nothing is hidden by shrinking.
+- **Arial by name**, resolved in the render container to metric-compatible Liberation
+  Sans. What is measured at build time is what PowerPoint lays out.
+- **Geometry and scope are tested, not eyeballed** — `npm run verify:scope` in the
+  supernatural repo renders both artifacts from fixtures and asserts that every figure
+  sits under a label naming its own population, and that no two text boxes collide. If you
+  are told the page changed, that is what proves it still holds.
 
 ## Why the footer is not optional
 
