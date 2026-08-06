@@ -47,6 +47,20 @@ households and 130 children" against a truth of 87 and 126.)
 If the slide shows dependents beside a station total, it shows
 `scope_station.label`. Roster figures always say whose they are.
 
+### The sheet covers the whole station unless you narrow it
+
+`position_type` holds five **peer** job families — officer, specialist, support, attache, analyst — not a
+seniority ladder with "officer" on top of the rest. One family is roughly a sixth of a station, so
+`muster_officer_slide({ station })` rosters **all** of them by default.
+
+Pass `role` only when the officer names a family ("just my officers"), and say that you narrowed it. A
+commander who asks who is unaccounted for and receives a sheet covering 17% of the station, with nothing on
+the page saying so, has been quietly misinformed — that is the same failure as mixing the two scopes.
+
+`scope_roster.excluded_note`, when present, names who is on **no** roster: people carrying no
+`position_type` at all. Today that is the arrivals feed — in transit, no phone, no email. Say it. The
+least reachable people on the station are the ones no roster can list.
+
 ### The same rule for reachability
 
 `unreachable` carries **two** populations: `unreachable.roster` (staff officers with no
